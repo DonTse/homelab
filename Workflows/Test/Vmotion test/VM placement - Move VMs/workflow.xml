@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item7" object-name="workflow:name=generic" id="0e91687c-5c0a-4a19-8689-1eba11cd4b09" editor-version="2.0" version="0.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>VM placement - Move VMs</display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="inputProperties" type="Properties"/>
+    </input>
+    <output/>
+    <attrib name="VMsToVmotion" type="Array/VC:VirtualMachine">
+        <value encoded="n">[]</value>
+    </attrib>
+    <attrib name="HostID" type="VC:HostSystem">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:host-9011'&amp;dunesName='VC:HostSystem'</value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="740.0"/>
+    </workflow-item>
+    <workflow-item name="item7" out-name="item10" type="task" script-module="com.vmware.library.vc.vm/vRAEventPayloadVMObject" comparator="0">
+        <display-name>vRAEventPayloadVMObject</display-name>
+        <script encoded="false">//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.vmware.library.vc.vm").vRAEventPayloadVMObject(inputProperties);
+</script>
+        <in-binding>
+            <bind name="inputProperties" type="Properties" export-name="inputProperties">
+                <description></description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="actionResult" type="Array/VC:VirtualMachine" export-name="VMsToVmotion"/>
+        </out-binding>
+        <description>Add a note to the workflow schema.</description>
+        <position y="60.0" x="300.0"/>
+    </workflow-item>
+    <workflow-item name="item10" out-name="item0" type="foreach" comparator="0">
+        <display-name>Quick migration of virtual machine</display-name>
+        <in-binding>
+            <bind name="vm" type="Array/VC:VirtualMachine" export-name="*VMsToVmotion">
+                <description>Virtual machine to migrate</description>
+            </bind>
+            <bind name="destinationHost" type="VC:HostSystem" export-name="HostID">
+                <description>Destination host</description>
+            </bind>
+        </in-binding>
+        <out-binding/>
+        <reference id="84808080808080808080808080808080E8808080012372877675871d32e0b30c1" type="Workflow"/>
+        <position y="60.0" x="500.0"/>
+    </workflow-item>
+</ns2:workflow>
