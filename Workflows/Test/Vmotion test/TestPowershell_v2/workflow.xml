@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="b9b2ee48-92e8-43a7-aca2-fa00ccd7ff24" editor-version="2.0" version="1.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>TestPowershell_v2</display-name>
+    <position y="50.0" x="100.0"/>
+    <input/>
+    <output/>
+    <attrib name="inputText" type="string">
+        <value encoded="n">This is the input</value>
+    </attrib>
+    <attrib name="outputText" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <attrib name="complexObject" type="Properties">
+        <value encoded="n">{}</value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="480.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <runtime>powercli:11-powershell-6.2</runtime>
+        <script encoded="false">function Handler($context, $inputs) {
+
+
+    Write-Host ("Input text is " + $inputs.inputText)
+
+    $newVar=$inputs.inputText + " with some other text"
+
+    Write-Host ("newVar " + $newVar)
+
+    $myObject = [pscustomObject]@{
+        key1 = "First property"
+        key2 = "Second property"
+        key3 = 123
+        key4 = 234
+    }
+
+    Write-Host $myObject
+
+    $output = @{outputText = $newVar;complexObject = $myObject}
+
+    return $output
+}
+</script>
+        <in-binding>
+            <bind name="inputText" type="string" export-name="inputText"/>
+        </in-binding>
+        <out-binding>
+            <bind name="outputText" type="string" export-name="outputText"/>
+            <bind name="complexObject" type="Properties" export-name="complexObject"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="180.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <runtime>powercli:11-powershell-6.2</runtime>
+        <script encoded="false">function Handler($context, $inputs) {
+
+    Write-Host "Task2, printing output from task1: " + $inputs.outputText
+
+    Write-Host("Task2, complexObject: " + $inputs.complexObject)
+
+    Write-Host ("Task2, complexObject - Property 1: " + $inputs.complexObject.key1)
+    Write-Host ("Task2, complexObject - Property 2: " + $inputs.complexObject.key2)
+    Write-Host ("Task2, complexObject - Property 3: " + $inputs.complexObject.key3)
+    write-host ("Diffrence key4 - key 3 is " + ($inputs.complexObject.key4 - $inputs.complexObject.key3))
+
+    if ($inputs.complexObject.key4 -gt $inputs.complexObject.key3) {
+        write-host ("Key4 is bigger")
+    }
+
+}
+</script>
+        <in-binding>
+            <bind name="outputText" type="string" export-name="outputText"/>
+            <bind name="complexObject" type="Properties" export-name="complexObject"/>
+        </in-binding>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="320.0"/>
+    </workflow-item>
+</ns2:workflow>
