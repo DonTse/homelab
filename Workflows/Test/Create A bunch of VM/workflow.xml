@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item4" object-name="workflow:name=generic" id="d898624d-caf5-44ee-a58c-8a8d2565e778" editor-version="2.0" version="0.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Create A bunch of VM</display-name>
+    <position y="50.0" x="60.0"/>
+    <input/>
+    <output/>
+    <attrib name="NumberOfVCpus" type="number">
+        <value encoded="n">2.0</value>
+    </attrib>
+    <attrib name="vmMemorySize" type="number">
+        <value encoded="n">4096.0</value>
+    </attrib>
+    <attrib name="vmDiskSize" type="number">
+        <value encoded="n">60.0</value>
+    </attrib>
+    <attrib name="diskThinProvisioned" type="boolean">
+        <value encoded="n">true</value>
+    </attrib>
+    <attrib name="vmGuestOs" type="VC:VirtualMachineGuestOsIdentifier">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='winNetEnterprise64Guest'&amp;dunesName='VC:VirtualMachineGuestOsIdentifier'</value>
+    </attrib>
+    <attrib name="vmFolder" type="VC:VmFolder">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:group-v8074'&amp;dunesName='VC:VmFolder'</value>
+    </attrib>
+    <attrib name="vmHost" type="VC:HostSystem">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:host-6008'&amp;dunesName='VC:HostSystem'</value>
+    </attrib>
+    <attrib name="vmDatastore" type="VC:Datastore">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:datastore-44018'&amp;dunesName='VC:Datastore'</value>
+    </attrib>
+    <attrib name="vmNetwork" type="VC:Network">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:network-6009'&amp;dunesName='VC:Network'</value>
+    </attrib>
+    <attrib name="vmResourcePool" type="VC:ResourcePool">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:resgroup-53002'&amp;dunesName='VC:ResourcePool'</value>
+    </attrib>
+    <attrib name="VirtMachName" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <attrib name="Counter" type="number">
+        <value encoded="n">0.0</value>
+    </attrib>
+    <attrib name="numberOfVMsToCreate" type="number">
+        <value encoded="n">2.0</value>
+    </attrib>
+    <attrib name="PowerOnTask" type="VC:Task">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="newVirtualMachine" type="VC:VirtualMachine">
+        <value encoded="n"/>
+    </attrib>
+    <workflow-item name="item1" out-name="item6" type="link" linked-workflow-id="BD808080808080808080808080808080A3C280800122528313869552e41805bb1" comparator="0">
+        <display-name>Create simple virtual machine</display-name>
+        <script encoded="false"></script>
+        <in-binding>
+            <bind name="vmName" type="string" export-name="VirtMachName">
+                <description>Virtual machine name</description>
+            </bind>
+            <bind name="vmGuestOs" type="VC:VirtualMachineGuestOsIdentifier" export-name="vmGuestOs">
+                <description>Guest operating system to use with the virtual machine</description>
+            </bind>
+            <bind name="vmFolder" type="VC:VmFolder" export-name="vmFolder">
+                <description>Virtual machine folder</description>
+            </bind>
+            <bind name="vmResourcePool" type="VC:ResourcePool" export-name="vmResourcePool">
+                <description>Resource pool in which to create the virtual machine</description>
+            </bind>
+            <bind name="vmHost" type="VC:HostSystem" export-name="vmHost">
+                <description>Host on which to create the virtual machine</description>
+            </bind>
+            <bind name="vmDiskSize" type="number" export-name="vmDiskSize">
+                <description>Size of virtual disk in GB</description>
+            </bind>
+            <bind name="vmMemorySize" type="number" export-name="vmMemorySize">
+                <description>Virtual machine's memory size in MB</description>
+            </bind>
+            <bind name="vmNbOfCpus" type="number" export-name="NumberOfVCpus">
+                <description>Number of virtual processors</description>
+            </bind>
+            <bind name="vmNetwork" type="VC:Network" export-name="vmNetwork">
+                <description>The network to connect to</description>
+            </bind>
+            <bind name="vmDatastore" type="VC:Datastore" export-name="vmDatastore">
+                <description>Datastore in which to store the virtual machine files</description>
+            </bind>
+            <bind name="diskThinProvisioned" type="boolean" export-name="diskThinProvisioned">
+                <description>Make disk thin-provisioned?</description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="newVM" type="VC:VirtualMachine" export-name="newVirtualMachine">
+                <description>The newly created VM</description>
+            </bind>
+        </out-binding>
+        <description> </description>
+        <position y="60.0" x="420.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item1" type="task" comparator="0">
+        <display-name>Generate VM name</display-name>
+        <script encoded="false">//VirtMachName = "VM" + (Counter + 1);&#13;
+&#13;
+function pad(number, size) {&#13;
+    var s = String(number);&#13;
+    while (s.length &lt; (size || 2)) {&#13;
+        s = "0" + s;&#13;
+    }&#13;
+    return s;&#13;
+}&#13;
+&#13;
+VirtMachName = "VM" + pad((Counter + 1),4)&#13;
+&#13;
+System.warn("Name: " + VirtMachName)</script>
+        <in-binding>
+            <bind name="Counter" type="number" export-name="Counter"/>
+        </in-binding>
+        <out-binding>
+            <bind name="VirtMachName" type="string" export-name="VirtMachName"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="280.0"/>
+    </workflow-item>
+    <workflow-item name="item3" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="120.0" x="100.0"/>
+    </workflow-item>
+    <workflow-item name="item4" out-name="item2" alt-out-name="item3" type="custom-condition" comparator="0">
+        <display-name>More VMs to Create</display-name>
+        <script encoded="false">if (Counter &lt; numberOfVMsToCreate) {&#13;
+    return true;&#13;
+} else {&#13;
+    return false;&#13;
+}</script>
+        <in-binding>
+            <bind name="Counter" type="number" export-name="Counter"/>
+            <bind name="numberOfVMsToCreate" type="number" export-name="numberOfVMsToCreate"/>
+        </in-binding>
+        <out-binding/>
+        <description>Custom decision based on a custom script.</description>
+        <position y="50.0" x="140.0"/>
+    </workflow-item>
+    <workflow-item name="item5" out-name="item4" type="task" prototype-id="increase-counter" content-mode="x" comparator="0">
+        <display-name>Increase counter</display-name>
+        <script encoded="false">//Auto-generated script
+counter = counter + 1;</script>
+        <in-binding>
+            <bind name="counter" type="number" export-name="Counter">
+                <description>Item to increase</description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="counter" type="number" export-name="Counter">
+                <description>Increased item</description>
+            </bind>
+        </out-binding>
+        <description>Increment a counter by one.</description>
+        <position y="120.0" x="220.0"/>
+    </workflow-item>
+    <workflow-item name="item6" out-name="item5" type="task" script-module="com.vmware.library.vc.vm.power/startVM" comparator="0">
+        <display-name>startVM</display-name>
+        <script encoded="false">//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.vmware.library.vc.vm.power").startVM(vm,host);
+</script>
+        <in-binding>
+            <bind name="vm" type="VC:VirtualMachine" export-name="newVirtualMachine">
+                <description>VM to start or resume</description>
+            </bind>
+            <bind name="host" type="VC:HostSystem" export-name="vmHost">
+                <description>[Optional] The host where the virtual machine is to be powered on. If no host is specified, the current associated host is used. This field must specify a host that is part of the same compute resource that the virtual machine is currently associated with. If this host is not compatible, the current host association is used. </description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="actionResult" type="VC:Task" export-name="PowerOnTask"/>
+        </out-binding>
+        <description>Add a note to the workflow schema.</description>
+        <position y="120.0" x="420.0"/>
+    </workflow-item>
+</ns2:workflow>
