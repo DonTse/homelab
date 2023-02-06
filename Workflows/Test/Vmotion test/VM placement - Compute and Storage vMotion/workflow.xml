@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="e19a7ae1-1f04-49a7-96a1-3683f6d79579" editor-version="2.0" version="0.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>VM placement - Compute and Storage vMotion</display-name>
+    <position y="50.0" x="100.0"/>
+    <input/>
+    <output/>
+    <attrib name="regexp" type="string">
+        <value encoded="n">vm-vm-mgmt-12\d+</value>
+    </attrib>
+    <attrib name="VMsMatchingRegex" type="Array/VC:VirtualMachine">
+        <value encoded="n">[128:VC:VirtualMachine#dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:vm-62008'&amp;dunesName='VC:VirtualMachine']</value>
+    </attrib>
+    <attrib name="destinationHost" type="VC:HostSystem">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:host-9011'&amp;dunesName='VC:HostSystem'</value>
+    </attrib>
+    <attrib name="pool" type="VC:ResourcePool">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:resgroup-53002'&amp;dunesName='VC:ResourcePool'</value>
+    </attrib>
+    <attrib name="state" type="VC:VirtualMachinePowerState">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='poweredOn'&amp;dunesName='VC:VirtualMachinePowerState'</value>
+    </attrib>
+    <attrib name="priority" type="VC:VirtualMachineMovePriority">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='highPriority'&amp;dunesName='VC:VirtualMachineMovePriority'</value>
+    </attrib>
+    <attrib name="datastore" type="VC:Datastore">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:datastore-10001'&amp;dunesName='VC:Datastore'</value>
+    </attrib>
+    <attrib name="allVMs" type="boolean">
+        <value encoded="n">true</value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="780.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" script-module="com.vmware.library.vc.vm/getAllVMsMatchingRegexp" comparator="0">
+        <display-name>getAllVMsMatchingRegexp</display-name>
+        <script encoded="false">//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.vmware.library.vc.vm").getAllVMsMatchingRegexp(regexp);
+</script>
+        <in-binding>
+            <bind name="regexp" type="string" export-name="regexp">
+                <description></description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="actionResult" type="Array/VC:VirtualMachine" export-name="VMsMatchingRegex"/>
+        </out-binding>
+        <description>Add a note to the workflow schema.</description>
+        <position y="60.0" x="200.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item3" type="foreach" comparator="0">
+        <display-name>Migrate virtual machine with vMotion</display-name>
+        <in-binding>
+            <bind name="vm" type="Array/VC:VirtualMachine" export-name="*VMsMatchingRegex">
+                <description>Virtual machine to migrate</description>
+            </bind>
+            <bind name="pool" type="VC:ResourcePool" export-name="pool">
+                <description>Destination resource pool for the virtual machine. If you do not set the resource pool parameter, the current resource pool is used as the destination pool</description>
+            </bind>
+            <bind name="host" type="VC:HostSystem" export-name="destinationHost">
+                <description>Destination host to which to migrate the virtual machine</description>
+            </bind>
+            <bind name="priority" type="VC:VirtualMachineMovePriority" export-name="priority">
+                <description>Priority of the migration task</description>
+            </bind>
+            <bind name="state" type="VC:VirtualMachinePowerState" export-name="state">
+                <description>(Optional) Only migrate the virtual machine if its power on state matches the specified state</description>
+            </bind>
+        </in-binding>
+        <out-binding/>
+        <reference id="BD8080808080808080808080808080803DC180800122528313869552e41805bb1" type="Workflow"/>
+        <position y="60.0" x="380.0"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item0" type="link" linked-workflow-id="97808080808080808080808080808080808080800124522604009086868f99767" comparator="0">
+        <display-name>Mass migrate virtual machines with storage vMotionn</display-name>
+        <script encoded="false"></script>
+        <in-binding>
+            <bind name="datastore" type="VC:Datastore" export-name="datastore">
+                <description>The datastore where the virtual machine(s) should be located (Optional)</description>
+            </bind>
+            <bind name="transform" type="string">
+                <description>Transformation to perform on the disks (Optional)</description>
+            </bind>
+            <bind name="allVMs" type="boolean" export-name="">
+                <description>Run storage vMotion on all virtual machines</description>
+            </bind>
+            <bind name="vms" type="Array/VC:VirtualMachine" export-name="VMsMatchingRegex">
+                <description>Virtual machines on which to run storage vMotion</description>
+            </bind>
+            <bind name="actionInput" type="Action" export-name="">
+                <description>Action to retrieve the list of virtual machines</description>
+            </bind>
+            <bind name="chooseAction" type="boolean">
+                <description>Run an action to retrieve the virtual machines</description>
+            </bind>
+            <bind name="cluster" type="VC:ClusterComputeResource">
+                <description>Action input parameter - Cluster</description>
+            </bind>
+            <bind name="computeResource" type="VC:ComputeResource">
+                <description>Action input parameter - ComputeResource</description>
+            </bind>
+            <bind name="datacenter" type="VC:Datacenter">
+                <description>Action input parameter - Datacenter</description>
+            </bind>
+            <bind name="folder" type="VC:VmFolder">
+                <description>Action input parameter - VmFolder</description>
+            </bind>
+            <bind name="hostSystem" type="VC:HostSystem">
+                <description>Action input parameter - HostSystem</description>
+            </bind>
+            <bind name="resourcePool" type="VC:ResourcePool">
+                <description>Action input parameter - ResourcePool</description>
+            </bind>
+            <bind name="os" type="VC:VirtualMachineGuestOsIdentifier">
+                <description>Action input parameter - GuestOS</description>
+            </bind>
+        </in-binding>
+        <out-binding/>
+        <description> </description>
+        <position y="60.0" x="560.0"/>
+    </workflow-item>
+</ns2:workflow>
