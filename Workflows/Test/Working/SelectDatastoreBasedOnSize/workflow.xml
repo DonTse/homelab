@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item4" object-name="workflow:name=generic" id="6bdb528f-35f6-400b-9aef-e4cec1ce78ab" editor-version="2.0" version="0.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>SelectDatastoreBasedOnSize</display-name>
+    <position y="150.0" x="60.0"/>
+    <input/>
+    <output>
+        <param name="datastore" type="VC:Datastore"/>
+    </output>
+    <attrib name="diskSizes" type="Array/number">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="memoryMB" type="number">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="VMSize" type="number">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="DatastoreFreeSize" type="number">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="VmConsumedSpace" type="number">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="AllDatastoresToMoveVM" type="Array/VC:Datastore">
+        <value encoded="n">[]</value>
+    </attrib>
+    <attrib name="SourceHost" type="VC:HostSystem">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="Counter" type="number">
+        <value encoded="n">0.0</value>
+    </attrib>
+    <attrib name="err_0" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <attrib name="vm" type="VC:VirtualMachine">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='vcenter.domain.local%2Cid:vm-62008'&amp;dunesName='VC:VirtualMachine'</value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="150.0" x="1140.0"/>
+    </workflow-item>
+    <workflow-item name="item4" out-name="item13" type="link" linked-workflow-id="BD80808080808080808080808080808099C380800122528313869552e41805bb1" comparator="0">
+        <display-name>Extract virtual machine information</display-name>
+        <script encoded="false"></script>
+        <in-binding>
+            <bind name="vm" type="VC:VirtualMachine" export-name="vm">
+                <description>Virtual machine from which to extract information</description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="folderName" type="string" export-name="">
+                <description>Virtual machine folder name</description>
+            </bind>
+            <bind name="folderId" type="string" export-name="">
+                <description>Virtual machine folder ID</description>
+            </bind>
+            <bind name="runningHostName" type="string">
+                <description>Name of host running the virtual machine</description>
+            </bind>
+            <bind name="runningHostId" type="string" export-name="">
+                <description>ID of host running the virtual machine</description>
+            </bind>
+            <bind name="resourcePoolName" type="string" export-name="">
+                <description>Resource pool name</description>
+            </bind>
+            <bind name="resourcePoolId" type="string" export-name="">
+                <description>Resource pool ID</description>
+            </bind>
+            <bind name="clusterName" type="string" export-name="">
+                <description>Cluster name</description>
+            </bind>
+            <bind name="clusterId" type="string" export-name="">
+                <description>Cluster ID</description>
+            </bind>
+            <bind name="computeResourceId" type="string" export-name="">
+                <description>Compute resource ID</description>
+            </bind>
+            <bind name="datastoresName" type="Array/string" export-name="">
+                <description>Datastore name</description>
+            </bind>
+            <bind name="datastoresId" type="Array/string" export-name="">
+                <description>Datastore ID</description>
+            </bind>
+            <bind name="diskSizes" type="Array/number" export-name="diskSizes">
+                <description>Disk sizes</description>
+            </bind>
+            <bind name="cpuCount" type="number" export-name="">
+                <description>Number of CPUs</description>
+            </bind>
+            <bind name="memoryMB" type="number" export-name="memoryMB">
+                <description>Memory in MB</description>
+            </bind>
+            <bind name="ipAddresses" type="Array/string" export-name="">
+                <description>IP addresses</description>
+            </bind>
+            <bind name="networks" type="Array/string" export-name="">
+                <description>Networks</description>
+            </bind>
+            <bind name="folder" type="VC:VmFolder" export-name="">
+                <description>Virtual machine folder</description>
+            </bind>
+            <bind name="host" type="VC:HostSystem" export-name="SourceHost">
+                <description>Host</description>
+            </bind>
+            <bind name="resourcePool" type="VC:ResourcePool" export-name="">
+                <description>Resource Pool</description>
+            </bind>
+            <bind name="cluster" type="VC:ClusterComputeResource" export-name="">
+                <description>Cluster</description>
+            </bind>
+            <bind name="computeResource" type="VC:ComputeResource" export-name="">
+                <description>Compute resource</description>
+            </bind>
+            <bind name="datastores" type="Array/VC:Datastore" export-name="">
+                <description>Array of datastores</description>
+            </bind>
+        </out-binding>
+        <description> </description>
+        <position y="160.0" x="140.0"/>
+    </workflow-item>
+    <workflow-item name="item7" out-name="item9" catch-name="item9" throw-bind-name="err_0" type="task" script-module="com.vmware.library.vc.datastore/getDatastoreFreeSize" comparator="0">
+        <display-name>getDatastoreFreeSize</display-name>
+        <script encoded="false">//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.vmware.library.vc.datastore").getDatastoreFreeSize(datastore);
+</script>
+        <in-binding>
+            <bind name="datastore" type="VC:Datastore" export-name="datastore">
+                <description></description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="actionResult" type="number" export-name="DatastoreFreeSize"/>
+        </out-binding>
+        <description>Add a note to the workflow schema.</description>
+        <position y="90.0" x="660.0"/>
+    </workflow-item>
+    <workflow-item name="item9" out-name="item10" alt-out-name="item17" type="custom-condition" comparator="0">
+        <display-name>Decision</display-name>
+        <script encoded="false">var VmConsumedSpace = new Number;&#13;
+VmConsumedSpace = vm.committedStorage.slice(0,-3)&#13;
+//VmConsumedSpace += 689000&#13;
+System.log("VMconsumer:" + VmConsumedSpace);&#13;
+System.log("Datastore:" + (DatastoreSize*0.8));&#13;
+System.log("Counter:" + Counter);&#13;
+&#13;
+if ((VmConsumedSpace) &lt;= (DatastoreSize*0.8) ) {&#13;
+    return true; &#13;
+} else {&#13;
+    return false;&#13;
+}</script>
+        <in-binding>
+            <bind name="DatastoreSize" type="number" export-name="DatastoreFreeSize"/>
+            <bind name="diskSizes" type="Array/number" export-name="diskSizes"/>
+            <bind name="datastore" type="VC:Datastore" export-name="datastore"/>
+            <bind name="Counter" type="number" export-name="Counter"/>
+            <bind name="memoryMB" type="number" export-name="memoryMB"/>
+            <bind name="vm" type="VC:VirtualMachine" export-name="vm"/>
+        </in-binding>
+        <out-binding/>
+        <description>Custom decision based on a custom script.</description>
+        <position y="150.0" x="660.0"/>
+    </workflow-item>
+    <workflow-item name="item10" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log(datastore.name)</script>
+        <in-binding>
+            <bind name="datastore" type="VC:Datastore" export-name="datastore"/>
+        </in-binding>
+        <out-binding>
+            <bind name="datastore" type="VC:Datastore" export-name="datastore"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="160.0" x="820.0"/>
+    </workflow-item>
+    <workflow-item name="item13" out-name="item15" type="task" script-module="com.vmware.library.vc.datastore/getDatastoreForHostAndResourcePool" comparator="0">
+        <display-name>getAvailableDatastores</display-name>
+        <script encoded="false">//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.vmware.library.vc.datastore").getDatastoreForHostAndResourcePool(host,pool,vm);
+</script>
+        <in-binding>
+            <bind name="host" type="VC:HostSystem" export-name="SourceHost">
+                <description></description>
+            </bind>
+            <bind name="pool" type="VC:ResourcePool" export-name="">
+                <description></description>
+            </bind>
+            <bind name="vm" type="VC:VirtualMachine" export-name="vm">
+                <description></description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="actionResult" type="Array/VC:Datastore" export-name="AllDatastoresToMoveVM"/>
+        </out-binding>
+        <description>Add a note to the workflow schema.</description>
+        <position y="160.0" x="260.0"/>
+    </workflow-item>
+    <workflow-item name="item14" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="280.0" x="420.0"/>
+    </workflow-item>
+    <workflow-item name="item15" out-name="item16" alt-out-name="item18" type="custom-condition" comparator="0">
+        <display-name>Decision</display-name>
+        <script encoded="false">var NUmberOfDatastores = AllDatastoresToMoveVM.length&#13;
+&#13;
+if (Counter &lt; NUmberOfDatastores) {&#13;
+    return true;&#13;
+} else {&#13;
+    return false;&#13;
+}</script>
+        <in-binding>
+            <bind name="AllDatastoresToMoveVM" type="Array/VC:Datastore" export-name="AllDatastoresToMoveVM"/>
+            <bind name="Counter" type="number" export-name="Counter"/>
+        </in-binding>
+        <out-binding/>
+        <description>Custom decision based on a custom script.</description>
+        <position y="150.0" x="380.0"/>
+    </workflow-item>
+    <workflow-item name="item16" out-name="item7" type="task" comparator="0">
+        <display-name>DatastoreObject</display-name>
+        <script encoded="false">datastore = AllDatastoresToMoveVM[Counter]&#13;
+</script>
+        <in-binding>
+            <bind name="AllDatastoresToMoveVM" type="Array/VC:Datastore" export-name="AllDatastoresToMoveVM"/>
+            <bind name="Counter" type="number" export-name="Counter"/>
+        </in-binding>
+        <out-binding>
+            <bind name="datastore" type="VC:Datastore" export-name="datastore"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="90.0" x="380.0"/>
+    </workflow-item>
+    <workflow-item name="item17" out-name="item15" type="task" prototype-id="increase-counter" content-mode="x" comparator="0">
+        <display-name>Increase counter</display-name>
+        <script encoded="false">//Auto-generated script
+counter = counter + 1;</script>
+        <in-binding>
+            <bind name="counter" type="number" export-name="Counter">
+                <description>Item to increase</description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="counter" type="number" export-name="Counter">
+                <description>Increased item</description>
+            </bind>
+        </out-binding>
+        <description>Increment a counter by one.</description>
+        <position y="160.0" x="520.0"/>
+    </workflow-item>
+    <workflow-item name="item18" out-name="item14" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("Datastore not available!")</script>
+        <in-binding/>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="220.0" x="380.0"/>
+    </workflow-item>
+</ns2:workflow>
