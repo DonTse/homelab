@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="947baf8c-8199-4003-aace-4a7c7432113a" editor-version="2.0" version="0.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Loading Custom Properties (custom)</display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="inputProperties" type="Properties"/>
+    </input>
+    <output/>
+    <attrib name="var_0" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="740.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">resourceName = inputProperties.get("resourceNames");&#13;
+System.log(resourceName);&#13;
+&#13;
+customProperties = inputProperties.get("customProperties");&#13;
+System.log("flavor: " + customProperties.get("flavor"));&#13;
+System.log("vcuuid: " + customProperties.get("vcUuid"));</script>
+        <in-binding>
+            <bind name="inputProperties" type="Properties" export-name="inputProperties"/>
+        </in-binding>
+        <out-binding>
+            <bind name="var_0" type="string" export-name="var_0"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="50.0" x="360.0"/>
+    </workflow-item>
+</ns2:workflow>
