@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="testAction14" result-type="PowerShell:PowerShellRemotePSObject" api-version="6.0.0" id="fd7635ff-0093-40f8-bdf2-dce2ee00248d" version="1.0.0" allowed-operations="vef" category-name="test">
+  <description><![CDATA[Auto generated.]]></description>
+  <param n="host" t="PowerShell:PowerShellHost"><![CDATA[]]></param>
+  <param n="sessionId" t="string"><![CDATA[]]></param>
+  <param n="ParamName" t="String"><![CDATA[]]></param>
+  <param n="ParamName1" t="String"><![CDATA[]]></param>
+  <script encoded="false"><![CDATA[var psScript = ''
+psScript +='$vCusername = "Administrator@vsphere.local"\n';
+psScript +='$vCpassword = ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force\n';
+psScript +='\n';
+psScript +='[pscredential]$vCcred = New-Object System.Management.Automation.PSCredential ($vCuserName, $vCpassword)\n';
+psScript +='\n';
+psScript +='$username = "Administrator"\n';
+psScript +='$password = ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force\n';
+psScript +='\n';
+psScript +='[pscredential]$cred = New-Object System.Management.Automation.PSCredential ($userName, $password)\n';
+psScript +='\n';
+psScript +='Connect-VIServer vcenter.domain.local -Credential $vCcred -Force\n';
+psScript +='Invoke-VMScript -VM dns01 -Server vcenter.domain.local -ScriptText {\n';
+psScript +='\n';
+psScript +='Get-Process -Name ' + ParamName + ' | Out-File  ' + ParamName1 + ' -Append\n';
+psScript +='\n';
+psScript +='} -GuestCredential $cred\n';
+return System.getModule("com.vmware.library.powershell").invokeScript( host,psScript,sessionId) ;]]></script>
+</dunes-script-module>
