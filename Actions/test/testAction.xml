@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="testAction" result-type="PowerShell:PowerShellRemotePSObject" api-version="6.0.0" id="6c24f998-4143-4cce-9c9d-9085a92e49f9" version="1.0.0" allowed-operations="vef" category-name="test">
+  <description><![CDATA[Auto generated.]]></description>
+  <param n="host" t="PowerShell:PowerShellHost"><![CDATA[]]></param>
+  <param n="sessionId" t="string"><![CDATA[]]></param>
+  <param n="vCusername" t="String"><![CDATA[]]></param>
+  <param n="vCpassword" t="String"><![CDATA[]]></param>
+  <param n="username" t="String"><![CDATA[]]></param>
+  <param n="password" t="String"><![CDATA[]]></param>
+  <param n="shareLocation" t="String"><![CDATA[]]></param>
+  <param n="shareLocation" t="String"><![CDATA[]]></param>
+  <param n="NodeName1" t="String"><![CDATA[]]></param>
+  <param n="NodeName2" t="String"><![CDATA[]]></param>
+  <script encoded="false"><![CDATA[var psScript = ''
+psScript +='$vCusername = "' + vCusername + '"\n';
+psScript +='$vCpassword = ConvertTo-SecureString "' + vCpassword + '" -AsPlainText -Force\n';
+psScript +='\n';
+psScript +='$username = "' + username + '"\n';
+psScript +='$password = ConvertTo-SecureString "' + password + '" -AsPlainText -Force\n';
+psScript +='\n';
+psScript +='[pscredential]$vCcred = New-Object System.Management.Automation.PSCredential ($vCuserName, $vCpassword)\n';
+psScript +='[pscredential]$cred = New-Object System.Management.Automation.PSCredential ($userName, $password)\n';
+psScript +='\n';
+psScript +='Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $false -Confirm:$false\n';
+psScript +='Connect-VIServer vcenter.domain.local -Credential $vCcred -Force \n';
+psScript +='$test = Invoke-VMScript -VM dns01 -Server vcenter.domain.local -ScriptText {\n';
+psScript +='\n';
+psScript +='$shareLocation = "' + shareLocation + '"\n';
+psScript +='$nodeName1 = "' + NodeName1 + '"\n';
+psScript +='$nodeName2 = "' + NodeName2 + '"\n';
+psScript +='\n';
+psScript +='Resolve-Path -Path $shareLocation -Credential $cred\n';
+psScript +='\n';
+psScript +='$certPath = $shareLocation + $nodeName1 + ".pfx"\n';
+psScript +='\n';
+psScript +='$certPath2 = $shareLocation + $nodeName2 + ".pfx"\n';
+psScript +='\n';
+psScript +='Test-Path -Path $certPath\n';
+psScript +='\n';
+psScript +='Test-Path -Path $certPath2\n';
+psScript +='\n';
+psScript +='$cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $certPath\n';
+psScript +='$cert2 = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $certPath2\n';
+psScript +='\n';
+psScript +='if ($cert -or $cert2) {\n';
+psScript +='    $cert.Thumbprint\n';
+psScript +='    $cert2.Thumbprint\n';
+psScript +='} else {\n';
+psScript +='return "testCompleted"\n';
+psScript +='}\n';
+psScript +='} -GuestCredential $cred\n';
+psScript +='\n';
+psScript +='write-host ($test)\n';
+psScript +='\n';
+psScript +='Disconnect-VIServer -Server * -Confirm:$false >> $null\n';
+return System.getModule("com.vmware.library.powershell").invokeScript( host,psScript,sessionId) ;]]></script>
+</dunes-script-module>
