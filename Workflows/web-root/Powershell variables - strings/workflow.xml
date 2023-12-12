@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="9af69d7e-e79c-4d80-a5be-2ae89777defd" editor-version="2.0" version="0.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Powershell variables - strings</display-name>
+    <position y="50.0" x="100.0"/>
+    <input/>
+    <output>
+        <param name="outputText" type="string"/>
+    </output>
+    <attrib name="Path" type="string">
+        <value encoded="n">c:\certs\</value>
+    </attrib>
+    <attrib name="FileName" type="string">
+        <value encoded="n">test</value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="60.0" x="520.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" comparator="0">
+        <display-name>CheckIfCertExistOnCADrive</display-name>
+        <runtime>powershell:7.3</runtime>
+        <script encoded="false">function Handler($context, $inputs) {
+
+    write-host($inputs)
+
+    $certLocationCA = $inputs.Path
+    $FileName = $inputs.FileName
+
+    $certLocation = $certLocationCA + $FileName + ".pfx"
+
+    write-host ($certLocation)
+    
+    if (test-path -path $certLocation) {
+        write-host("1")
+        $output=@{outputText = 'Exist'}  
+    } else {
+        write-host("2")
+        $output=@{outputText = 'Missing'}  
+    }
+    write-host($output.outputText)
+    return $output
+}
+</script>
+        <in-binding>
+            <bind name="Path" type="string" export-name="Path"/>
+            <bind name="FileName" type="string" export-name="FileName"/>
+        </in-binding>
+        <out-binding>
+            <bind name="outputText" type="string" export-name="outputText"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="70.0" x="180.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <runtime>powershell:7.3</runtime>
+        <script encoded="false">function Handler($context, $inputs) {
+    $inputsString = $inputs | ConvertTo-Json -Compress
+
+    Write-Host($inputs.outputText)
+
+    Write-Host "Inputs were $inputsString"
+
+    $output=@{status = 'done'}
+
+    return $output
+}
+</script>
+        <in-binding>
+            <bind name="outputText" type="string" export-name="outputText"/>
+        </in-binding>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="70.0" x="360.0"/>
+    </workflow-item>
+</ns2:workflow>
