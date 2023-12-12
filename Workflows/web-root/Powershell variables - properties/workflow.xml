@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="d3e51370-b6da-4aec-994d-708c061e0335" editor-version="2.0" version="0.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Powershell variables - properties</display-name>
+    <position y="50.0" x="100.0"/>
+    <input/>
+    <output/>
+    <attrib name="Path" type="string">
+        <value encoded="n">c:\certs\</value>
+    </attrib>
+    <attrib name="FileName" type="string">
+        <value encoded="n">test</value>
+    </attrib>
+    <attrib name="outputText" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <attrib name="complexObject" type="Properties">
+        <value encoded="n">{}</value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="60.0" x="520.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" comparator="0">
+        <display-name>CheckIfCertExistOnCADrive</display-name>
+        <runtime>powershell:7.3</runtime>
+        <script encoded="false">function Handler($context, $inputs) {
+
+    write-host($inputs)
+
+    $certLocationCA = $inputs.Path
+    $FileName = $inputs.FileName
+
+    $certLocation = $certLocationCA + $FileName + ".pfx"
+
+    write-host ($certLocation)
+
+    $newObject = [pscustomobject]@{
+        key1 = "key1"
+        key2 = "key2"
+        key3 = 123
+    }
+    
+    if (test-path -path $certLocation) {
+        write-host("1")
+        $output=@{outputText = 'Exist';complexObject = $newObject}  
+    } else {
+        write-host("2")
+        $output=@{outputText = 'Missing'; complexObject = $newObject}  
+    }
+    write-host($output.outputText)
+    write-host($output.complexObject)
+    return $output
+}
+</script>
+        <in-binding>
+            <bind name="Path" type="string" export-name="Path"/>
+            <bind name="FileName" type="string" export-name="FileName"/>
+        </in-binding>
+        <out-binding>
+            <bind name="outputText" type="string" export-name="outputText"/>
+            <bind name="complexObject" type="Properties" export-name="complexObject"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="70.0" x="180.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <runtime>powershell:7.3</runtime>
+        <script encoded="false">function Handler($context, $inputs) {
+
+    Write-Host($inputs.outputText)
+    Write-Host($inputs.complexObject.key1)
+    Write-Host("key3:" + $inputs.complexObject.key3)
+}
+</script>
+        <in-binding>
+            <bind name="outputText" type="string" export-name="outputText"/>
+            <bind name="complexObject" type="Properties" export-name="complexObject"/>
+        </in-binding>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="70.0" x="360.0"/>
+    </workflow-item>
+</ns2:workflow>
