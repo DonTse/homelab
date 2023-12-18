@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item0" object-name="Workflow:name=generic" id="58142429-a43f-4cd0-809d-5fbc842df0f6" editor-version="2.0" version="0.0.0" api-version="5.5.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Copy of List directory content</display-name>
+    <description>Lists the contents of a directory.
+
+Demonstarates :
+	- How to check the status of an execution
+	- How to get errors reported by PowerShell
+	- How to work with the invocation result</description>
+    <position y="270.0" x="180.0"/>
+    <input>
+        <param name="inputProperties" type="Properties"/>
+    </input>
+    <output/>
+    <attrib name="host" type="PowerShell:PowerShellHost">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='55d30013-c1eb-4a75-9d8d-86640d860dc3'&amp;dunesName='PowerShell:PowerShellHost'</value>
+    </attrib>
+    <attrib name="certDataOutput" type="Properties">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="shareLocation" type="string">
+        <value encoded="n">\\\\dscserver.domain.local\\share\\</value>
+    </attrib>
+    <workflow-item name="item0" out-name="item2" type="task" comparator="0">
+        <display-name>Get Directory list</display-name>
+        <script encoded="false">var sess;
+try {
+    customProperties = inputProperties.get("customProperties");
+	sess = host.openSession()
+    var psScript = ''
+    psScript +='$username = ' + customProperties.get("domainAdministrator") + '"domain\\Administrator"\n';
+    psScript +='$password = ' + customProperties.get("domainAdministratorPassword") + 'ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force\n';
+    psScript +='[pscredential]$cred = New-Object System.Management.Automation.PSCredential ($userName, $password)\n';
+    psScript +='$sharelocation = ' + shareLocation + '\n';
+    psScript +='$CN =' + certDataOutput.get("cn") +'\n';
+    psScript +='$SAN =' + certDataOutput.get("san") +'\n';
+    psScript +='Invoke-Command -ComputerName "dns01.domain.local" -Credential $cred -Authentication Credssp -ScriptBlock {\n';
+    psScript +='$result = C:\\Users\\Administrator\\Documents\\RequestAcert-Copy.ps1 -CN $using:CN -export -ExportPath $using:sharelocation\n';
+    psScript +='return $result    }\n';
+    psScript +='\n';
+	sess.addCommandFromString(psScript)
+	var invResult = sess.invokePipeline();
+	//Show result
+	System.log( invResult.getHostOutput() );
+
+} catch ( ex ) {			
+	System.log (ex);
+} finally {
+	if (sess) {
+		host.closeSession( sess.getSessionId());
+	}
+}</script>
+        <in-binding>
+            <bind name="host" type="PowerShell:PowerShellHost" export-name="host"/>
+            <bind name="inputProperties" type="Properties" export-name="inputProperties"/>
+            <bind name="shareLocation" type="string" export-name="shareLocation"/>
+            <bind name="certDataOutput" type="Properties" export-name="certDataOutput"/>
+        </in-binding>
+        <out-binding/>
+        <position y="180.0" x="140.0"/>
+    </workflow-item>
+    <workflow-item name="item1" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="10.0" x="180.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item1" type="task" comparator="0">
+        <display-name>Getting Cert Data from VRA</display-name>
+        <runtime>powershell:7.3</runtime>
+        <script encoded="false">function Handler($context, $inputs) {
+    $CN = ($inputs.resourceName + "." + $inputs.customProperties.domainName)
+    $SAN = $inputs.resourceName + "," + ($inputs.resourceName + "." + $inputs.customProperties.domainName)
+    $returnObject = [pscustomobject]@{
+        cn = $CN
+        san = $SAN
+    }
+    write-host($returnObject)
+    certDataOutput = $returnObject
+}
+</script>
+        <in-binding>
+            <bind name="inputProperties" type="Properties" export-name="inputProperties"/>
+        </in-binding>
+        <out-binding>
+            <bind name="certDataOutput" type="Properties" export-name="certDataOutput"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="90.0" x="140.0"/>
+    </workflow-item>
+</ns2:workflow>
