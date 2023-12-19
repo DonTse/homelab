@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item2" object-name="workflow:name=generic" id="822c11b8-86d8-4e61-adfd-9847dd84867c" editor-version="2.0" version="0.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Issue a cert</display-name>
+    <position y="60.0" x="100.0"/>
+    <input>
+        <param name="inputProperties" type="Properties"/>
+    </input>
+    <output>
+        <param name="output" type="PowerShell:PowerShellRemotePSObject">
+            <description>Script execution result</description>
+        </param>
+    </output>
+    <attrib name="host" type="PowerShell:PowerShellHost">
+        <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='55d30013-c1eb-4a75-9d8d-86640d860dc3'&amp;dunesName='PowerShell:PowerShellHost'</value>
+        <description>PowerShell host</description>
+    </attrib>
+    <attrib name="script" type="string">
+        <value encoded="n"></value>
+        <description>PowerShell script</description>
+    </attrib>
+    <attrib name="Tags" type="Properties">
+        <value encoded="n">{}</value>
+    </attrib>
+    <attrib name="customProperties" type="Properties">
+        <value encoded="n">{}</value>
+    </attrib>
+    <attrib name="shareLocation" type="string">
+        <value encoded="n">\\dscserver.domain.local\share\</value>
+    </attrib>
+    <attrib name="resourceName" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="60.0" x="620.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item3" type="task" comparator="0">
+        <display-name>Get-VMData</display-name>
+        <script encoded="false">var Tags = inputProperties.tags || new Properties();&#13;
+var customProperties = inputProperties.customProperties || new Properties();&#13;
+var resourceName = inputProperties.resourceNames[0]&#13;
+  &#13;
+//Use workflow metadata to set tags and properties&#13;
+var userName = System.getContext().getParameter("__metadata_userName");&#13;
+var eventTopicId = System.getContext().getParameter("__metadata_eventTopicId");&#13;
+  &#13;
+Tags.put("UserName",userName);&#13;
+Tags.put("EventTopic",eventTopicId);&#13;
+customProperties.put("UserName",userName);&#13;
+customProperties.put("EventTopic",eventTopicId);</script>
+        <in-binding>
+            <bind name="inputProperties" type="Properties" export-name="inputProperties"/>
+        </in-binding>
+        <out-binding>
+            <bind name="Tags" type="Properties" export-name="Tags"/>
+            <bind name="customProperties" type="Properties" export-name="customProperties"/>
+            <bind name="resourceName" type="string" export-name="resourceName"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="70.0" x="220.0"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item0" type="task" comparator="0">
+        <display-name>Get-Thumbprint</display-name>
+        <script encoded="false">var session;&#13;
+try {&#13;
+	session = host.openSession();&#13;
+    var psScript = ''&#13;
+    psScript +='\n';&#13;
+    psScript +='$username ="' + customProperties.get("domainAdminUPN") +'"\n';&#13;
+    psScript +='$password = ConvertTo-SecureString "' + customProperties.get("domainAdministratorPassword") + '" -AsPlainText -Force\n';&#13;
+    psScript +='[pscredential]$cred = New-Object System.Management.Automation.PSCredential ($userName, $password)\n';&#13;
+    psScript +='$sharelocation = "' + shareLocation + '"\n';&#13;
+    psScript +='$CN = "' + resourceName + '"\n';&#13;
+    psScript +='\n';&#13;
+    psScript +='$3 = Invoke-Command -ComputerName "dns01.domain.local" -Credential $cred -Authentication Credssp -ScriptBlock {\n';&#13;
+    psScript +='    $result = C:\\Users\\Administrator\\Documents\\RequestAcert-Copy.ps1 -CN $using:CN -export -ExportPath $using:sharelocation\n';&#13;
+    psScript +='    return $result\n';&#13;
+    psScript +='    }\n';&#13;
+    psScript +='\n';&#13;
+    psScript +='$newObject = [pscustomobject]@{\n';&#13;
+    psScript +='    thumbprint = "$3"\n';&#13;
+    psScript +='    }\n';&#13;
+    psScript +='return $newObject\n';&#13;
+&#13;
+    var invResult = sess.invokeScript(psScript)&#13;
+    //Show result&#13;
+    System.log( "------- HOST OUTPUT ---------------------------" );&#13;
+    System.log( invResult.getHostOutput() );&#13;
+    System.log( "-------- HOST OUTPUT END --------------------------" );&#13;
+&#13;
+    var invResult = System.getModule("com.vmware.library.powershell").invokeScript(host,psScript,session.getSessionId()) ;&#13;
+        System.log( invResult.getHostOutput );&#13;
+        System.log(output)&#13;
+&#13;
+    		// Get PowerShellRemotePSObject&#13;
+		var psObject = invResult.getResults();&#13;
+		var directories = psObject.getRootObject();&#13;
+		&#13;
+		var isList =  directories instanceof Array&#13;
+		if ( isList ){&#13;
+			for (idx in directories){&#13;
+				var item = directories[idx];&#13;
+				if ( item.instanceOf('System.IO.FileInfo') ){//check type of object&#13;
+					System.log( item.getProperty('FullName') );//extract value from result&#13;
+				}&#13;
+			}&#13;
+		} else {&#13;
+			System.log( directories.getProperty('FullName') );//extract value from result&#13;
+		}&#13;
+&#13;
+} finally {&#13;
+	if (session){&#13;
+		host.closeSession(session.getSessionId());&#13;
+	}&#13;
+}</script>
+        <in-binding>
+            <bind name="customProperties" type="Properties" export-name="customProperties"/>
+            <bind name="shareLocation" type="string" export-name="shareLocation"/>
+            <bind name="host" type="PowerShell:PowerShellHost" export-name="host"/>
+            <bind name="resourceName" type="string" export-name="resourceName"/>
+        </in-binding>
+        <out-binding>
+            <bind name="output" type="PowerShell:PowerShellRemotePSObject" export-name="output"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="70.0" x="420.0"/>
+    </workflow-item>
+</ns2:workflow>
