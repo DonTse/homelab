@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="0b0e65f9-9f3f-4783-ab74-6fd8b783f8db" editor-version="2.0" version="1.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Passing JavaScript array</display-name>
+    <position y="50.0" x="100.0"/>
+    <input/>
+    <output/>
+    <attrib name="var_0" type="Array/Properties">
+        <value encoded="n">[]</value>
+    </attrib>
+    <attrib name="var_1" type="Array/string">
+        <value encoded="n"/>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="580.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">const myArr = [&#13;
+    {&#13;
+     studenName: "jack",&#13;
+     studenClass: 6,&#13;
+     studenSection: "a"&#13;
+    },&#13;
+    {&#13;
+     studenName: "tom",&#13;
+     studenClass: 6,&#13;
+     studenSection: "a"&#13;
+    }&#13;
+];&#13;
+System.log(myArr[0].studenName)&#13;
+var_0 = myArr</script>
+        <in-binding/>
+        <out-binding>
+            <bind name="var_0" type="Array/Properties" export-name="var_0"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="180.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item3" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("------------")&#13;
+System.log(var_0)&#13;
+System.log(var_0[1].studenName)&#13;
+&#13;
+const newObject = {&#13;
+     studenName: "don",&#13;
+     studenClass: 8,&#13;
+     studenSection: "c"&#13;
+}&#13;
+&#13;
+newArr = var_0&#13;
+&#13;
+newArr.push(newObject)&#13;
+&#13;
+var_1 = newArr</script>
+        <in-binding>
+            <bind name="var_0" type="Array/Properties" export-name="var_0"/>
+        </in-binding>
+        <out-binding>
+            <bind name="var_1" type="Array/string" export-name="var_1"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="320.0"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <runtime>powershell:7.3</runtime>
+        <script encoded="false">function Handler($context, $inputs) {
+    write-host ("powershell ===========================")
+    write-host ($inputs.var_1)
+}
+</script>
+        <in-binding>
+            <bind name="var_1" type="Array/string" export-name="var_1"/>
+        </in-binding>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="420.0"/>
+    </workflow-item>
+</ns2:workflow>
