@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="0b0e65f9-9f3f-4783-ab74-6fd8b783f8db" editor-version="2.0" version="1.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="0b0e65f9-9f3f-4783-ab74-6fd8b783f8db" editor-version="2.0" version="2.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
     <display-name>Passing JavaScript array</display-name>
     <position y="50.0" x="100.0"/>
     <input/>
@@ -7,8 +7,8 @@
     <attrib name="var_0" type="Array/Properties">
         <value encoded="n">[]</value>
     </attrib>
-    <attrib name="var_1" type="Array/string">
-        <value encoded="n"/>
+    <attrib name="var_1" type="Array/Properties">
+        <value encoded="n">[]</value>
     </attrib>
     <workflow-item name="item0" type="end" end-mode="0" comparator="0">
         <in-binding/>
@@ -50,16 +50,18 @@ const newObject = {&#13;
      studenSection: "c"&#13;
 }&#13;
 &#13;
-newArr = var_0&#13;
+const myArray = [];&#13;
 &#13;
-newArr.push(newObject)&#13;
+var_0.push(newObject)&#13;
 &#13;
-var_1 = newArr</script>
+var_1 = var_0&#13;
+&#13;
+System.log(var_1[0])</script>
         <in-binding>
             <bind name="var_0" type="Array/Properties" export-name="var_0"/>
         </in-binding>
         <out-binding>
-            <bind name="var_1" type="Array/string" export-name="var_1"/>
+            <bind name="var_1" type="Array/Properties" export-name="var_1"/>
         </out-binding>
         <description>Simple task with custom script capability.</description>
         <position y="60.0" x="320.0"/>
@@ -69,11 +71,12 @@ var_1 = newArr</script>
         <runtime>powershell:7.3</runtime>
         <script encoded="false">function Handler($context, $inputs) {
     write-host ("powershell ===========================")
+    write-host ($inputs.var_1.count)
     write-host ($inputs.var_1)
 }
 </script>
         <in-binding>
-            <bind name="var_1" type="Array/string" export-name="var_1"/>
+            <bind name="var_1" type="Array/Properties" export-name="var_1"/>
         </in-binding>
         <out-binding/>
         <description>Simple task with custom script capability.</description>
