@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item2" object-name="workflow:name=generic" id="822c11b8-86d8-4e61-adfd-9847dd84867c" editor-version="2.0" version="2.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item2" object-name="workflow:name=generic" id="822c11b8-86d8-4e61-adfd-9847dd84867c" editor-version="2.0" version="3.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
     <display-name>Issue a cert</display-name>
     <position y="60.0" x="100.0"/>
     <input>
@@ -116,7 +116,29 @@ System.log (ex);&#13;
 &#13;
 customProperties.Node1Thumbprint = thumbprint&#13;
 customProperties.Node2Thumbprint = thumbprint2&#13;
-</script>
+&#13;
+const CertData = [&#13;
+    {&#13;
+     VM: resourceName,&#13;
+     Location: shareLocation + resourceName + '.' + customProperties.get("domainName") + '.pfx',&#13;
+     Thumbprint: thumbprint&#13;
+    },&#13;
+    {&#13;
+     VM: customProperties.get("peerNodeName"),&#13;
+     Location: shareLocation + customProperties.get("peerNodeName") + '.' + customProperties.get("domainName") + '.pfx',&#13;
+     Thumbprint: thumbprint2&#13;
+    }&#13;
+];&#13;
+&#13;
+System.log(CertData)&#13;
+System.log(CertData[0].Thumbprint)&#13;
+System.log(CertData[0].Location)&#13;
+System.log(CertData[0].VM)&#13;
+System.log(CertData[1].Thumbprint)&#13;
+System.log(CertData[1].Location)&#13;
+System.log(CertData[1].VM)&#13;
+&#13;
+customProperties.put("certData",CertData)</script>
         <in-binding>
             <bind name="customProperties" type="Properties" export-name="customProperties"/>
             <bind name="shareLocation" type="string" export-name="shareLocation"/>
@@ -129,6 +151,6 @@ customProperties.Node2Thumbprint = thumbprint2&#13;
             <bind name="customProperties" type="Properties" export-name="customProperties"/>
         </out-binding>
         <description>Simple task with custom script capability.</description>
-        <position y="70.0" x="400.0"/>
+        <position y="80.0" x="420.0"/>
     </workflow-item>
 </ns2:workflow>
