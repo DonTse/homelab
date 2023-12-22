@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item2" object-name="workflow:name=generic" id="822c11b8-86d8-4e61-adfd-9847dd84867c" editor-version="2.0" version="1.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item2" object-name="workflow:name=generic" id="822c11b8-86d8-4e61-adfd-9847dd84867c" editor-version="2.0" version="2.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
     <display-name>Issue a cert</display-name>
     <position y="60.0" x="100.0"/>
     <input>
@@ -9,6 +9,7 @@
         <param name="thumbprint" type="string">
             <description>Script execution result</description>
         </param>
+        <param name="thumbprint2" type="string"/>
     </output>
     <attrib name="host" type="PowerShell:PowerShellHost">
         <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='55d30013-c1eb-4a75-9d8d-86640d860dc3'&amp;dunesName='PowerShell:PowerShellHost'</value>
@@ -57,7 +58,7 @@ customProperties.put("EventTopic",eventTopicId);</script>
         <position y="70.0" x="220.0"/>
     </workflow-item>
     <workflow-item name="item3" out-name="item0" type="task" comparator="0">
-        <display-name>Get-Thumbprint</display-name>
+        <display-name>Get-CertData</display-name>
         <script encoded="false">var session;&#13;
 try {&#13;
 	session = host.openSession();&#13;
@@ -83,42 +84,39 @@ try {&#13;
     thumbprint = invResult.getHostOutput()&#13;
     System.log( "-------- HOST OUTPUT END --------------------------" );&#13;
     &#13;
-    // Above works as expected&#13;
-    //Check for errors&#13;
-    if (invResult.invocationState  == 'Failed'){&#13;
-        System.error(invResult.getErrors());&#13;
-    } else {&#13;
-        // Get PowerShellRemotePSObject&#13;
-        var psObject = invResult.getResults();&#13;
-        //Show row XML &#13;
-        var psList = psObject.getRootObject();&#13;
-        // No need to parse the result yoursekf. This is done by PoeerShell plugin itself&#13;
-        // Using PowerShellPSObject.getProperty methods you can access properties of returned object &#13;
-        if ( psList instanceof Array ){&#13;
-            for (idx in psList){&#13;
-                var item = psList[idx];&#13;
-                System.log( item.getProperty('Name') );//extract value from result&#13;
-                System.log( item.getProperty('Path') );//extract value from result&#13;
-                // you can also get the real type of PowerShell object as retturned by PowerShell engine&#13;
-                System.log( item.getTypes() );&#13;
-            }&#13;
-        }&#13;
-        // Uncoment below lines to see row JSON/XML&#13;
-        //System.log( "------- JSON ---------------------------" );&#13;
-        //System.log( invResult.getResults().getAsJson() );&#13;
-        //System.log( "-------- JSON END --------------------------" );&#13;
-        //System.log( "------- ROW XML ---------------------------" );&#13;
-        //System.log( invResult.getResults().getXml() );&#13;
-        //System.log( "-------- ROW XML END --------------------------" );&#13;
-        // Added till here as copied from https://communities.vmware.com/t5/VMware-Aria-Automation/Getting-output-from-a-PowerShell-Script-on-VRO-task/td-p/1867062&#13;
-    }&#13;
+    var psScript2 = ''&#13;
+    psScript2 +='\n';&#13;
+    psScript2 +='$username ="' + customProperties.get("domainAdminUPN") +'"\n';&#13;
+    psScript2 +='$password = ConvertTo-SecureString "' + customProperties.get("domainAdministratorPassword") + '" -AsPlainText -Force\n';&#13;
+    psScript2 +='[pscredential]$cred = New-Object System.Management.Automation.PSCredential ($userName, $password)\n';&#13;
+    psScript2 +='$sharelocation = "' + shareLocation + '"\n';&#13;
+    psScript2 +='$CN = "'  + customProperties.get("peerNodeName") + '.' + customProperties.get("domainName") + '"\n';&#13;
+    psScript2 +='$SAN = "DNS=' + customProperties.get("peerNodeName") + '.' + customProperties.get("domainName") + ',DNS=' + customProperties.get("peerNodeName") + '"\n';&#13;
+    psScript2 +='\n';&#13;
+    psScript2 +='$thumbprint = Invoke-Command -ComputerName "dns01.domain.local" -Credential $cred -Authentication Credssp -ScriptBlock {\n';&#13;
+    psScript2 +='    $result = C:\\Users\\Administrator\\Documents\\RequestAcert-Copy.ps1 -CN $using:CN -SAN $using:SAN -TemplateName "WebServerDSC" -keyLength 2048 -CAName "domain.local\\domain-DNS01-CA" -export -ExportPath $using:sharelocation\n';&#13;
+    psScript2 +='    return $result\n';&#13;
+    psScript2 +='    }\n';&#13;
+    psScript2 +='return $thumbprint\n';&#13;
+&#13;
+    var invResult2 = session.invokeScript(psScript2)&#13;
+    //Show result&#13;
+    System.log( "------- HOST OUTPUT ---------------------------" );&#13;
+    System.log( invResult2.getHostOutput() );&#13;
+    thumbprint2 = invResult2.getHostOutput()&#13;
+    System.log( "-------- HOST OUTPUT END --------------------------" );&#13;
+&#13;
 } catch ( ex ) {&#13;
 System.log (ex);&#13;
 } finally {&#13;
 	if (session){&#13;
 		host.closeSession(session.getSessionId());&#13;
 	}&#13;
-}</script>
+}&#13;
+&#13;
+customProperties.Node1Thumbprint = thumbprint&#13;
+customProperties.Node2Thumbprint = thumbprint2&#13;
+</script>
         <in-binding>
             <bind name="customProperties" type="Properties" export-name="customProperties"/>
             <bind name="shareLocation" type="string" export-name="shareLocation"/>
@@ -127,6 +125,8 @@ System.log (ex);&#13;
         </in-binding>
         <out-binding>
             <bind name="thumbprint" type="string" export-name="thumbprint"/>
+            <bind name="thumbprint2" type="string" export-name="thumbprint2"/>
+            <bind name="customProperties" type="Properties" export-name="customProperties"/>
         </out-binding>
         <description>Simple task with custom script capability.</description>
         <position y="70.0" x="400.0"/>
